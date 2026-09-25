@@ -21,17 +21,16 @@ struct Nodo
 
 // Variables globales
 
-Nodo *inicio = nullptr;     // Puntero al primer nodo
-Nodo *fin = nullptr;        // Puntero al último nodo
-int cantidad_canciones = 0; // Contador de canciones
+Nodo *inicio = nullptr; // Puntero al primer nodo
+Nodo *fin = nullptr;    // Puntero al último nodo
 
 // Declaraciones de funciones
-
-void agregarCancion();
+Cancion pedirDatosCancion();
+void agregarCancion(Cancion cancion);
 void mostrarPlaylist();
 void mostrarPlaylistInversa();
-void buscarCancion();
-void eliminarCancion();
+void buscarCancion(Cancion cancion);
+void eliminarCancion(Cancion cancion);
 void contarCanciones();
 void calcularDuracionTotal();
 void liberarMemoria();
@@ -49,8 +48,7 @@ int main()
         std::cout << "3. Mostrar playlist (fin -> inicio)\n";
         std::cout << "4. Buscar cancion\n";
         std::cout << "5. Eliminar cancion\n";
-        std::cout << "6. Contar canciones\n";
-        std::cout << "7. Duracion total de playlist\n";
+        std::cout << "6. Duracion total de playlist\n";
         std::cout << "0. Salir\n";
         std::cout << "Ingrese una opcion: ";
         std::cin >> opcion;
@@ -59,8 +57,11 @@ int main()
         switch (opcion)
         {
         case 1:
-            agregarCancion();
-            break;
+        {
+            Cancion nueva = pedirDatosCancion();
+            agregarCancion(nueva);
+        }
+        break;
         case 2:
             mostrarPlaylist();
             break;
@@ -68,15 +69,28 @@ int main()
             mostrarPlaylistInversa();
             break;
         case 4:
-            buscarCancion();
+        {
+            Cancion buscada;
+
+            std::cout << "\n--- Buscar cancion ---\n";
+            std::cout << "Ingrese el titulo de la cancion: ";
+            std::getline(std::cin, buscada.titulo);
+
+            buscarCancion(buscada);
             break;
+        }
         case 5:
-            eliminarCancion();
+        {
+            Cancion eliminada;
+
+            std::cout << "\n--- Eliminar cancion ---\n";
+            std::cout << "Ingrese el titulo de la cancion a eliminar: ";
+            std::getline(std::cin, eliminada.titulo);
+
+            eliminarCancion(eliminada);
             break;
+        }
         case 6:
-            contarCanciones();
-            break;
-        case 7:
             calcularDuracionTotal();
             break;
         case 0:
@@ -91,9 +105,8 @@ int main()
     return 0;
 }
 
-// Agregar una canción al final de la lista
-
-void agregarCancion()
+// Pedir los datos de una canción
+Cancion pedirDatosCancion()
 {
     Cancion nueva;
 
@@ -119,10 +132,16 @@ void agregarCancion()
     std::cin.ignore();
     std::cout << "Genero: ";
     std::getline(std::cin, nueva.genero);
+    return nueva;
+}
 
+// Agregar una canción al final de la lista
+
+void agregarCancion(Cancion cancion)
+{
     // Crear el nuevo nodo
     Nodo *nuevo_nodo = new Nodo;
-    nuevo_nodo->cancion = nueva;
+    nuevo_nodo->cancion = cancion;
     nuevo_nodo->siguiente = nullptr;
     nuevo_nodo->anterior = nullptr;
 
@@ -141,7 +160,6 @@ void agregarCancion()
         fin = nuevo_nodo;
     }
 
-    cantidad_canciones++;
     std::cout << "Cancion agregada exitosamente!\n";
 }
 
@@ -186,7 +204,7 @@ void mostrarPlaylistInversa()
     }
 
     Nodo *actual = fin;
-    int posicion = cantidad_canciones;
+    int posicion = 1;
 
     while (actual != nullptr)
     {
@@ -197,13 +215,13 @@ void mostrarPlaylistInversa()
                   << clasificarDuracion(actual->cancion.duracion) << ")\n";
         std::cout << "  Genero: " << actual->cancion.genero << "\n";
         actual = actual->anterior;
-        posicion--;
+        posicion++;
     }
 }
 
 // Buscar una canción por título
 
-void buscarCancion()
+void buscarCancion(Cancion cancion)
 {
     if (inicio == nullptr)
     {
@@ -211,17 +229,12 @@ void buscarCancion()
         return;
     }
 
-    std::string titulo_buscado;
-    std::cout << "\n--- Buscar cancion ---\n";
-    std::cout << "Ingrese el titulo de la cancion: ";
-    std::getline(std::cin, titulo_buscado);
-
     Nodo *actual = inicio;
     bool encontrada = false;
 
     while (actual != nullptr)
     {
-        if (actual->cancion.titulo == titulo_buscado)
+        if (actual->cancion.titulo == cancion.titulo)
         {
             std::cout << "\nCancion encontrada:\n";
             std::cout << "  Titulo: " << actual->cancion.titulo << "\n";
@@ -242,7 +255,7 @@ void buscarCancion()
 
 // Eliminar una canción por título
 
-void eliminarCancion()
+void eliminarCancion(Cancion cancion)
 {
     if (inicio == nullptr)
     {
@@ -250,16 +263,11 @@ void eliminarCancion()
         return;
     }
 
-    std::string titulo_eliminar;
-    std::cout << "\n--- Eliminar cancion ---\n";
-    std::cout << "Ingrese el titulo de la cancion a eliminar: ";
-    std::getline(std::cin, titulo_eliminar);
-
     Nodo *actual = inicio;
 
     while (actual != nullptr)
     {
-        if (actual->cancion.titulo == titulo_eliminar)
+        if (actual->cancion.titulo == cancion.titulo)
         {
             // Caso 1: Un solo nodo
             if (actual == inicio && actual == fin)
@@ -287,7 +295,7 @@ void eliminarCancion()
             }
 
             delete actual;
-            cantidad_canciones--;
+
             std::cout << "Cancion eliminada exitosamente!\n";
             return;
         }
@@ -295,14 +303,6 @@ void eliminarCancion()
     }
 
     std::cout << "Cancion no encontrada.\n";
-}
-
-// Contar canciones
-
-void contarCanciones()
-{
-    std::cout << "\n--- Cantidad de canciones ---\n";
-    std::cout << "Total de canciones en la playlist: " << cantidad_canciones << "\n";
 }
 
 // Calcular duración total de la playlist
@@ -364,6 +364,5 @@ void liberarMemoria()
 
     inicio = nullptr;
     fin = nullptr;
-    cantidad_canciones = 0;
     std::cout << "Memoria liberada. Hasta luego!\n";
 }

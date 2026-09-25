@@ -19,15 +19,17 @@ El sistema utilizará una **lista doblemente enlazada** con dos estructuras:
 - `siguiente` (Nodo*): puntero al siguiente nodo
 - `anterior` (Nodo*): puntero al nodo anterior
 
-### Funciones  por implementar
+### Funciones implementadas
 
-1. `agregarCancion()` → añade una canción al final de la lista
-2. `mostrarPlaylist()` → lista todas las canciones (de inicio a fin)
-3. `mostrarPlaylistInversa()` → lista todas las canciones (de fin a inicio)
-4. `buscarCancion()` → busca una canción por título y muestra su información
-5. `eliminarCancion()` → elimina una canción de la lista por título
-6. `contarCanciones()` → retorna la cantidad total de canciones
+1. `pedirDatosCancion()` → solicita al usuario los datos de una canción y retorna el struct
+2. `agregarCancion(Cancion cancion)` → recibe un struct Cancion y lo añade al final de la lista
+3. `mostrarPlaylist()` → lista todas las canciones (de inicio a fin)
+4. `mostrarPlaylistInversa()` → lista todas las canciones (de fin a inicio)
+5. `buscarCancion(Cancion cancion)` → recibe un struct con el título y busca la canción en la lista
+6. `eliminarCancion(Cancion cancion)` → recibe un struct con el título y elimina la canción de la lista
 7. `calcularDuracionTotal()` → calcula la duración total de la playlist
+8. `clasificarDuracion(float duracion)` → clasifica una canción como "Corta", "Media" o "Larga"
+9. `liberarMemoria()` → libera toda la memoria asignada al salir del programa
 
 ### Cálculos automáticos
 
@@ -46,12 +48,20 @@ El sistema utilizará una **lista doblemente enlazada** con dos estructuras:
 3. Mostrar playlist (fin -> inicio)
 4. Buscar canción
 5. Eliminar canción
-6. Contar canciones
-7. Duración total de playlist
+6. Duración total de playlist
 0. Salir
 ```
 
->💡 El menú es opcional y solo sirve para probar de forma interactiva cómo cambian los resultados. El objetivo principal es comprender el funcionamiento de las listas doblemente enlazadas.
+### Paso de struct como parámetro
+
+Las funciones `agregarCancion`, `buscarCancion` y `eliminarCancion` reciben el struct `Cancion`
+como parámetro. Esto permite que los datos sean manipulados de forma clara y estructurada:
+
+- `agregarCancion(nueva)` → recibe una canción completa con todos sus datos
+- `buscarCancion(buscada)` → recibe solo el título lleno para realizar la búsqueda
+- `eliminarCancion(eliminada)` → recibe solo el título lleno para realizar la eliminación
+
+>💡 El menú es opcional y solo sirve para probar de forma interactiva cómo cambian los resultados. El objetivo principal es comprender el funcionamiento de las listas doblemente enlazadas y el paso de estructuras como parámetros.
 
 ---
 
