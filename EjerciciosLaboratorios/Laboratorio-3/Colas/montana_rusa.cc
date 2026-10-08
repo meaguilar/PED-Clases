@@ -9,11 +9,64 @@ struct Persona {
     int numero_asiento;
     std::string categoria;
 };
+//Declarando las funciones
+Persona LlenarDatosPersona(int siguiente_asiento);
+void AgregarPersona(std::queue<Persona>& cola, const Persona& persona);
+void MostrarCola(std::queue<Persona> cola);
+void IniciarViaje(std::queue<Persona>& cola);
 
-// Registra una persona y le asigna un asiento consecutivo.
-void AgregarPersona(std::queue<Persona>& cola, int& siguiente_asiento) {
+int main() {
+    std::queue<Persona> cola;
+    int siguiente_asiento = 1;
+    int opcion;
+
+    do {
+        std::cout << "\n=== Sistema de montana rusa ===\n";
+        std::cout << "1. Agregar persona\n";
+        std::cout << "2. Mostrar cola\n";
+        std::cout << "3. Iniciar viaje\n";
+        std::cout << "0. Salir\n";
+        std::cout << "Seleccione una opcion: ";
+
+        if (!(std::cin >> opcion)) {
+            std::cin.clear();
+            std::cin.ignore(1000, '\n');
+            std::cout << "Ingrese una opcion valida.\n";
+            continue;
+        }
+
+        std::cin.ignore(1000, '\n');
+
+        switch (opcion) {
+            case 1:{
+                Persona nueva = LlenarDatosPersona(siguiente_asiento);
+                AgregarPersona(cola, nueva);
+                siguiente_asiento++;
+                break;
+            }
+
+            case 2:
+                MostrarCola(cola);
+                break;
+
+            case 3:
+                IniciarViaje(cola);
+                break;
+
+            case 0:
+                std::cout << "Cerrando el sistema.\n";
+                break;
+
+            default:
+                std::cout << "Opcion invalida.\n";
+        }
+    } while (opcion != 0);
+
+    return 0;
+}
+
+Persona LlenarDatosPersona(int siguiente_asiento) {
     Persona nueva_persona;
-
     std::cout << "Ingrese el nombre del pasajero: ";
     std::getline(std::cin, nueva_persona.nombre);
 
@@ -21,12 +74,13 @@ void AgregarPersona(std::queue<Persona>& cola, int& siguiente_asiento) {
     std::getline(std::cin, nueva_persona.categoria);
 
     nueva_persona.numero_asiento = siguiente_asiento;
-
-    cola.push(nueva_persona);
-    siguiente_asiento++;
-
+    return nueva_persona;
+}
+// Registra una persona y le asigna un asiento consecutivo.
+void AgregarPersona(std::queue<Persona>& cola, const Persona& persona) {
+    cola.push(persona);
     std::cout << "Pasajero registrado. Asiento asignado: "
-              << nueva_persona.numero_asiento << "\n";
+              << persona.numero_asiento << "\n";
 }
 
 // Muestra los pasajeros sin modificar la cola original.
@@ -85,51 +139,4 @@ void IniciarViaje(std::queue<Persona>& cola) {
         std::cout << "Quedan " << cola.size()
                   << " pasajeros esperando.\n";
     }
-}
-
-int main() {
-    std::queue<Persona> cola;
-    int siguiente_asiento = 1;
-    int opcion;
-
-    do {
-        std::cout << "\n=== Sistema de montana rusa ===\n";
-        std::cout << "1. Agregar persona\n";
-        std::cout << "2. Mostrar cola\n";
-        std::cout << "3. Iniciar viaje\n";
-        std::cout << "0. Salir\n";
-        std::cout << "Seleccione una opcion: ";
-
-        if (!(std::cin >> opcion)) {
-            std::cin.clear();
-            std::cin.ignore(1000, '\n');
-            std::cout << "Ingrese una opcion valida.\n";
-            continue;
-        }
-
-        std::cin.ignore(1000, '\n');
-
-        switch (opcion) {
-            case 1:
-                AgregarPersona(cola, siguiente_asiento);
-                break;
-
-            case 2:
-                MostrarCola(cola);
-                break;
-
-            case 3:
-                IniciarViaje(cola);
-                break;
-
-            case 0:
-                std::cout << "Cerrando el sistema.\n";
-                break;
-
-            default:
-                std::cout << "Opcion invalida.\n";
-        }
-    } while (opcion != 0);
-
-    return 0;
 }
