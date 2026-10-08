@@ -9,7 +9,7 @@ struct Pagina {
     int numero_visitas;
     std::string fecha_visita;
 };
-//Declaranco las funciones 
+//Declarando las funciones 
 bool LlenarDatosPagina(Pagina& pagina);
 void AgregarPagina(std::stack<Pagina>& historial, const Pagina& pagina);
 void MostrarHistorial(std::stack<Pagina> historial);
