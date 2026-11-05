@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <string>
 
@@ -8,21 +7,19 @@ struct Contacto {
   std::string correo;
 };
 
-// Representa un nodo en el árbol binario de búsqueda
+// Representa un nodo en el árbol binario de búsqueda 
 struct NodoContacto {
   Contacto contacto;
   NodoContacto* izquierdo;
   NodoContacto* derecho;
-
-  explicit NodoContacto(const Contacto& nuevo_contacto)
-      : contacto(nuevo_contacto), izquierdo(nullptr), derecho(nullptr) {}
 };
 
 void SolicitarDatos(Contacto& contacto);
+NodoContacto* CrearNodo(const Contacto& nuevo_contacto);
 NodoContacto* InsertarNodo(NodoContacto* raiz, const Contacto& nuevo_contacto, bool& fue_insertado);
-NodoContacto* BuscarNodo(NodoContacto* raiz, const std::string& nombre_buscar);
+void RecorridoInorden(NodoContacto* raiz, int& contador);
 void MostrarAgenda(NodoContacto* raiz);
-void BuscarContactoPorNombre(NodoContacto* raiz, const std::string& nombre_buscar);
+bool BuscarContactoPorNombre(NodoContacto* raiz, const std::string& nombre_buscar);
 void LiberarArbol(NodoContacto*& raiz);
 
 int main() {
@@ -48,8 +45,9 @@ int main() {
         if (fue_insertado) {
           std::cout << "Contacto registrado correctamente en el arbol.\n";
         } else {
-          std::cout << "Aviso: Ya existe un contacto con el nombre \""
-                    << contacto_temporal.nombre << "\". No se permiten duplicados.\n";
+          std::cout << "Aviso: Ya existe un contacto con el numero \""
+                    << contacto_temporal.telefono
+                    << "\". No se permiten numeros duplicados.\n";
         }
         break;
       }
@@ -68,7 +66,10 @@ int main() {
         } else {
           std::cout << "Ingresa el nombre del contacto a buscar: ";
           std::cin >> nombre_buscar;
-          BuscarContactoPorNombre(raiz, nombre_buscar);
+          if (!BuscarContactoPorNombre(raiz, nombre_buscar)) {
+            std::cout << "No se encontro ningun contacto con el nombre \""
+                      << nombre_buscar << "\".\n";
+          }
         }
         break;
 
@@ -97,16 +98,25 @@ void SolicitarDatos(Contacto& contacto) {
   std::cin >> contacto.correo;
 }
 
+NodoContacto* CrearNodo(const Contacto& nuevo_contacto) {
+  NodoContacto* nuevo_nodo = new NodoContacto;
+  nuevo_nodo->contacto = nuevo_contacto;
+  nuevo_nodo->izquierdo = nullptr;
+  nuevo_nodo->derecho = nullptr;
+  return nuevo_nodo;
+}
+
 NodoContacto* InsertarNodo(NodoContacto* raiz, const Contacto& nuevo_contacto,
                            bool& fue_insertado) {
   if (raiz == nullptr) {
     fue_insertado = true;
-    return new NodoContacto(nuevo_contacto);
+    return CrearNodo(nuevo_contacto);
   }
 
-  if (nuevo_contacto.nombre < raiz->contacto.nombre) {
-    raiz->izquierdo = InsertarNodo(raiz->izquierdo, nuevo_contacto, fue_insertado);
-  } else if (nuevo_contacto.nombre > raiz->contacto.nombre) {
+  if (nuevo_contacto.telefono < raiz->contacto.telefono) {
+    raiz->izquierdo =
+        InsertarNodo(raiz->izquierdo, nuevo_contacto, fue_insertado);
+  } else if (nuevo_contacto.telefono > raiz->contacto.telefono) {
     raiz->derecho = InsertarNodo(raiz->derecho, nuevo_contacto, fue_insertado);
   } else {
     fue_insertado = false;
@@ -115,52 +125,46 @@ NodoContacto* InsertarNodo(NodoContacto* raiz, const Contacto& nuevo_contacto,
   return raiz;
 }
 
-NodoContacto* BuscarNodo(NodoContacto* raiz, const std::string& nombre_buscar) {
-  if (raiz == nullptr || raiz->contacto.nombre == nombre_buscar) {
-    return raiz;
-  }
+void RecorridoInorden(NodoContacto* raiz, int& contador) {
+    if (raiz != nullptr) {
+        RecorridoInorden(raiz->izquierdo, contador);
+        
+        auto imprimir_contacto = [&contador](const Contacto& c) {
+        std::cout << contador++ << ". Nombre: " << c.nombre
+                  << " - Telefono: " << c.telefono
+                  << " - Correo: " << c.correo << "\n";
+    };
+    imprimir_contacto(raiz->contacto);
 
-  if (nombre_buscar < raiz->contacto.nombre) {
-    return BuscarNodo(raiz->izquierdo, nombre_buscar);
-  }
-
-  return BuscarNodo(raiz->derecho, nombre_buscar);
-}
-
-template <typename Accion>
-void RecorridoInorden(NodoContacto* raiz, Accion accion) {
-  if (raiz != nullptr) {
-    RecorridoInorden(raiz->izquierdo, accion);
-    accion(raiz->contacto);
-    RecorridoInorden(raiz->derecho, accion);
+    RecorridoInorden(raiz->derecho, contador);
   }
 }
 
 void MostrarAgenda(NodoContacto* raiz) {
-  std::cout << "\n--- Contactos Registrados (Orden Alfabetico por ABB) ---\n";
+  std::cout << "\n--- Contactos Registrados (Ordenados por Telefono en ABB) ---\n";
   int contador = 1;
-
-  auto imprimir_contacto = [&contador](const Contacto& c) {
-    std::cout << contador++ << ". Nombre: " << c.nombre
-              << " - Telefono: " << c.telefono
-              << " - Correo: " << c.correo << "\n";
-  };
-
-  RecorridoInorden(raiz, imprimir_contacto);
+  RecorridoInorden(raiz, contador);
 }
 
-void BuscarContactoPorNombre(NodoContacto* raiz,
+bool BuscarContactoPorNombre(NodoContacto* raiz,
                              const std::string& nombre_buscar) {
-  NodoContacto* resultado = BuscarNodo(raiz, nombre_buscar);
-
-  if (resultado != nullptr) {
-    std::cout << "Contacto encontrado: " << resultado->contacto.nombre
-              << " - Telefono: " << resultado->contacto.telefono
-              << " - Correo: " << resultado->contacto.correo << "\n";
-  } else {
-    std::cout << "No se encontro ningun contacto con el nombre \""
-              << nombre_buscar << "\".\n";
+  if (raiz == nullptr) {
+    return false;
   }
+
+  auto coincide_nombre = [&nombre_buscar](const Contacto& c) {
+    return c.nombre == nombre_buscar;
+  };
+
+  if (coincide_nombre(raiz->contacto)) {
+    std::cout << "Contacto encontrado: Nombre: " << raiz->contacto.nombre
+              << " - Telefono: " << raiz->contacto.telefono
+              << " - Correo: " << raiz->contacto.correo << "\n";
+    return true;
+  }
+
+  return BuscarContactoPorNombre(raiz->izquierdo, nombre_buscar) ||
+         BuscarContactoPorNombre(raiz->derecho, nombre_buscar);
 }
 
 void LiberarArbol(NodoContacto*& raiz) {
